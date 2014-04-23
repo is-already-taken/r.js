@@ -23072,6 +23072,15 @@ define('parse', ['./esprimaAdapter', 'lang'], function (esprima, lang) {
                     foundRange = stringData.range;
                     return false;
                 }
+            } else if (requireType && requireType === 'requirejsConfigVariable') {
+                arg = node.init;
+
+                if (arg) {
+                    stringData = parse.nodeToString(fileContents, arg);
+                    jsConfig = stringData.value;
+                    foundRange = stringData.range;
+                    return false;
+                }
             } else {
                 arg = parse.getRequireObjectLiteral(node);
                 if (arg) {
@@ -23245,6 +23254,9 @@ define('parse', ['./esprimaAdapter', 'lang'], function (esprima, lang) {
                 // require/requirejs.config({}) call
                 callName = c.object.name + 'Config';
             }
+        } else if (node && node.type === 'VariableDeclarator' &&
+                node.id && node.id.name === '_RequireJsConfig') {
+            callName = 'requirejsConfigVariable';
         }
 
         return callName;
